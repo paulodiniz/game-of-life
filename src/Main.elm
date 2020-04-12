@@ -7,7 +7,6 @@ import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
 import Color
 import Html exposing (Html, div)
-import Html.Attributes exposing (style)
 import Time exposing (Posix)
 
 
@@ -43,54 +42,42 @@ width =
 height =
     400
 
-
-centerX =
-    width / 2
-
-
-centerY =
-    height / 2
+squareSize =
+    50
 
 
 view : Model -> Html Msg
 view { count } =
-    div
-        [ style "display" "flex"
-        , style "justify-content" "center"
-        , style "align-items" "center"
-        ]
-        [ Canvas.toHtml
-            ( width, height )
-            [ style "border" "10px solid rgba(0,0,0,0.1)" ]
-            [ clearScreen
-            , render count
-            ]
-        ]
+    Canvas.toHtml ( width, height )
+        []
+        drawSquares
 
 
-clearScreen =
-    shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
+drawSquares =
+    [ renderSquare 0 0
+    , renderSquare 0 1
+    , renderSquare 0 2
+    , renderSquare 0 3
+    , renderSquare 1 0
+    , renderSquare 1 1
+    , renderSquare 1 2
+    , renderSquare 1 3
+    , renderSquare 2 0
+    , renderSquare 2 1
+    , renderSquare 2 2
+    , renderSquare 2 3
+    ]
 
 
-render count =
+renderSquare line col =
     let
-        size =
-            width / 3
+        posX =
+            col * squareSize
 
-        x =
-            -(size / 2)
-
-        y =
-            -(size / 2)
+        posY =
+            line * squareSize
     in
-    shapes
-        [ transform
-            [ translate centerX centerY
-            , rotate (degrees (count * 3))
-            ]
-        , fill (Color.hsl (degrees (count / 4)) 0.3 0.7)
-        ]
-        [ rect ( x, y ) size size ]
+    shapes [ fill (Color.rgba 0 0 0 1) ] [ rect ( posX, posY ) squareSize squareSize ]
 
 
 main : Program () Model Msg
