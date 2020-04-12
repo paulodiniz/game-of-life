@@ -5144,11 +5144,33 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Dead = {$: 'Dead'};
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Main$squareSize = 50;
+var $author$project$Main$width = 400;
+var $author$project$Main$numCols = $elm$core$Basics$round($author$project$Main$width / $author$project$Main$squareSize);
+var $author$project$Main$height = 400;
+var $author$project$Main$numRows = $elm$core$Basics$round($author$project$Main$height / $author$project$Main$squareSize);
+var $author$project$Main$initialCells = function () {
+	var initializeCols = function (_v0) {
+		return $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$initialize,
+				$author$project$Main$numCols,
+				$elm$core$Basics$always($author$project$Main$Dead)));
+	};
+	return $elm$core$Array$toList(
+		A2($elm$core$Array$initialize, $author$project$Main$numRows, initializeCols));
+}();
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{count: 0},
+		{cells: $author$project$Main$initialCells, cols: $author$project$Main$numCols, rows: $author$project$Main$numRows},
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$Frame = function (a) {
@@ -5293,12 +5315,19 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{count: model.count + 1}),
-			$elm$core$Platform$Cmd$none);
+		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -5316,14 +5345,6 @@ var $joakin$elm_canvas$Canvas$Internal$Canvas$Rect = F3(
 var $joakin$elm_canvas$Canvas$rect = F3(
 	function (pos, width, height) {
 		return A3($joakin$elm_canvas$Canvas$Internal$Canvas$Rect, pos, width, height);
-	});
-var $avh4$elm_color$Color$RgbaSpace = F4(
-	function (a, b, c, d) {
-		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
-	});
-var $avh4$elm_color$Color$rgba = F4(
-	function (r, g, b, a) {
-		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, a);
 	});
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
 	return {$: 'DrawableShapes', a: a};
@@ -5453,43 +5474,61 @@ var $joakin$elm_canvas$Canvas$shapes = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes(ss)
 				}));
 	});
-var $author$project$Main$renderSquare = F2(
-	function (line, col) {
-		var squareSize = 50;
-		var posY = line * squareSize;
-		var posX = col * squareSize;
+var $author$project$Main$renderSquare = F3(
+	function (line, col, color) {
+		var posY = line * $author$project$Main$squareSize;
+		var posX = col * $author$project$Main$squareSize;
 		return A2(
 			$joakin$elm_canvas$Canvas$shapes,
 			_List_fromArray(
 				[
-					$joakin$elm_canvas$Canvas$Settings$fill(
-					A4($avh4$elm_color$Color$rgba, posX, 0, 0, 1))
+					$joakin$elm_canvas$Canvas$Settings$fill(color)
 				]),
 			_List_fromArray(
 				[
 					A3(
 					$joakin$elm_canvas$Canvas$rect,
 					_Utils_Tuple2(posX, posY),
-					squareSize,
-					squareSize)
+					$author$project$Main$squareSize,
+					$author$project$Main$squareSize)
 				]));
 	});
-var $author$project$Main$drawSquares = _List_fromArray(
-	[
-		A2($author$project$Main$renderSquare, 0, 0),
-		A2($author$project$Main$renderSquare, 0, 1),
-		A2($author$project$Main$renderSquare, 0, 2),
-		A2($author$project$Main$renderSquare, 0, 3),
-		A2($author$project$Main$renderSquare, 1, 0),
-		A2($author$project$Main$renderSquare, 1, 1),
-		A2($author$project$Main$renderSquare, 1, 2),
-		A2($author$project$Main$renderSquare, 1, 3),
-		A2($author$project$Main$renderSquare, 2, 0),
-		A2($author$project$Main$renderSquare, 2, 1),
-		A2($author$project$Main$renderSquare, 2, 2),
-		A2($author$project$Main$renderSquare, 2, 3)
-	]);
-var $author$project$Main$height = 400;
+var $avh4$elm_color$Color$RgbaSpace = F4(
+	function (a, b, c, d) {
+		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
+	});
+var $avh4$elm_color$Color$rgb = F3(
+	function (r, g, b) {
+		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, 1.0);
+	});
+var $author$project$Main$renderCell = F3(
+	function (rowIndex, columnIndex, cell) {
+		var color = function () {
+			if (cell.$ === 'Alive') {
+				return A3($avh4$elm_color$Color$rgb, 0, 0, 0);
+			} else {
+				return A3($avh4$elm_color$Color$rgb, 1, 1, 1);
+			}
+		}();
+		return A3($author$project$Main$renderSquare, rowIndex, columnIndex, color);
+	});
+var $author$project$Main$parseRow = F2(
+	function (rowIndex, rowCells) {
+		return A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (columnIndex, cell) {
+					return A3($author$project$Main$renderCell, rowIndex, columnIndex, cell);
+				}),
+			rowCells);
+	});
+var $author$project$Main$drawSquares = function (_v0) {
+	var rows = _v0.rows;
+	var cols = _v0.cols;
+	var cells = _v0.cells;
+	return $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Main$parseRow, cells));
+};
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
 var $joakin$elm_canvas$Canvas$cnvs = A2($elm$html$Html$canvas, _List_Nil, _List_Nil);
 var $elm$json$Json$Encode$list = F2(
@@ -5843,7 +5882,6 @@ var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$core$Basics$round = _Basics_round;
 var $avh4$elm_color$Color$toCssString = function (_v0) {
 	var r = _v0.a;
 	var g = _v0.b;
@@ -6258,14 +6296,12 @@ var $joakin$elm_canvas$Canvas$toHtml = F3(
 			attrs,
 			entities);
 	});
-var $author$project$Main$width = 400;
-var $author$project$Main$view = function (_v0) {
-	var count = _v0.count;
+var $author$project$Main$view = function (model) {
 	return A3(
 		$joakin$elm_canvas$Canvas$toHtml,
 		_Utils_Tuple2($author$project$Main$width, $author$project$Main$height),
 		_List_Nil,
-		$author$project$Main$drawSquares);
+		$author$project$Main$drawSquares(model));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});

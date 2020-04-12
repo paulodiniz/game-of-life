@@ -1,11 +1,12 @@
 module Main exposing (main)
 
+import Array exposing (Array)
 import Browser
 import Browser.Events exposing (onAnimationFrame, onAnimationFrameDelta)
 import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
-import Color
+import Color exposing (Color)
 import Html exposing (Html, div)
 import Time exposing (Posix)
 
@@ -14,13 +15,26 @@ type Msg
     = Frame Float
 
 
+type CellState
+    = Dead
+    | Alive
+
+
 type alias Model =
-    { count : Float }
+    { rows : Int, cols : Int, cells : List (List CellState) }
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { count = 0 }, Cmd.none )
+    ( { rows = numRows, cols = numCols, cells = initialCells }, Cmd.none )
+
+
+initialCells =
+    let
+        initializeCols _ =
+            Array.initialize numCols (always Dead) |> Array.toList
+    in
+    Array.initialize numRows initializeCols |> Array.toList
 
 
 subscriptions : Model -> Sub Msg
@@ -32,7 +46,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Frame _ ->
-            ( { model | count = model.count + 1 }, Cmd.none )
+            ( model, Cmd.none )
+
+
+numRows =
+    round <| height / squareSize
+
+
+numCols =
+    round <| width / squareSize
+
+
+view : Model -> Html Msg
+view model =
+    Canvas.toHtml ( width, height )
+        []
+        (drawSquares model)
 
 
 width =
@@ -42,42 +71,41 @@ width =
 height =
     400
 
+
 squareSize =
     50
 
 
-view : Model -> Html Msg
-view { count } =
-    Canvas.toHtml ( width, height )
-        []
-        drawSquares
+drawSquares : Model -> List Renderable
+drawSquares { rows, cols, cells } =
+    List.indexedMap parseRow cells |> List.concat
 
 
-drawSquares =
-    [ renderSquare 0 0
-    , renderSquare 0 1
-    , renderSquare 0 2
-    , renderSquare 0 3
-    , renderSquare 1 0
-    , renderSquare 1 1
-    , renderSquare 1 2
-    , renderSquare 1 3
-    , renderSquare 2 0
-    , renderSquare 2 1
-    , renderSquare 2 2
-    , renderSquare 2 3
-    ]
+parseRow : Int -> List CellState -> List Renderable
+parseRow rowIndex rowCells =
+    List.indexedMap (\columnIndex cell -> renderCell rowIndex columnIndex cell) rowCells
 
 
-renderSquare line col =
+renderCell : Int -> Int -> CellState -> Renderable
+renderCell rowIndex columnIndex cell =
+    let
+        case cell of
+            Alive -> Color.rgb 0 0 0
+            Dead  -> Color.rgb 1 1 1
+    in
+    renderSquare rowIndex columnIndex color
+
+
+renderSquare : Int -> Int -> Color -> Renderable
+renderSquare line col color =
     let
         posX =
-            col * squareSize
+            col * squareSize |> toFloat
 
         posY =
-            line * squareSize
+            line * squareSize |> toFloat
     in
-    shapes [ fill (Color.rgba 0 0 0 1) ] [ rect ( posX, posY ) squareSize squareSize ]
+    shapes [ fill color ] [ rect ( posX, posY ) squareSize squareSize ]
 
 
 main : Program () Model Msg
