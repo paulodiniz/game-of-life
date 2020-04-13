@@ -5316,10 +5316,10 @@ var $elm$random$Random$list = F2(
 			});
 	});
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$squareSize = 50;
-var $author$project$Main$width = 400;
+var $author$project$Main$squareSize = 10;
+var $author$project$Main$width = 800;
 var $author$project$Main$numCols = $elm$core$Basics$round($author$project$Main$width / $author$project$Main$squareSize);
-var $author$project$Main$height = 400;
+var $author$project$Main$height = 800;
 var $author$project$Main$numRows = $elm$core$Basics$round($author$project$Main$height / $author$project$Main$squareSize);
 var $elm$random$Random$map2 = F3(
 	function (func, _v0, _v1) {
@@ -5349,13 +5349,16 @@ var $elm$random$Random$pair = F2(
 			genA,
 			genB);
 	});
-var $author$project$Main$aliveCells = A2(
-	$elm$random$Random$list,
-	10,
-	A2(
-		$elm$random$Random$pair,
-		A2($elm$random$Random$int, 0, $author$project$Main$numRows),
-		A2($elm$random$Random$int, 0, $author$project$Main$numCols)));
+var $author$project$Main$aliveCells = function () {
+	var numberOfAlive = ((($author$project$Main$numRows * $author$project$Main$numCols) * 10) / 100) | 0;
+	return A2(
+		$elm$random$Random$list,
+		numberOfAlive,
+		A2(
+			$elm$random$Random$pair,
+			A2($elm$random$Random$int, 0, $author$project$Main$numRows),
+			A2($elm$random$Random$int, 0, $author$project$Main$numCols)));
+}();
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -6104,7 +6107,6 @@ var $author$project$Main$aliveNeighbours = F2(
 			},
 			neighbours);
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Main$updateCell = F4(
 	function (model, x, y, state) {
 		var an = $elm$core$List$length(
@@ -6112,7 +6114,6 @@ var $author$project$Main$updateCell = F4(
 				$author$project$Main$aliveNeighbours,
 				model,
 				_Utils_Tuple2(x, y)));
-		var _v0 = A2($elm$core$Debug$log, 'alive neighbours', an);
 		return ((an < 2) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Dead : (((an === 2) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Alive : (((an === 3) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Alive : (((an > 3) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Dead : (((an === 3) && _Utils_eq(state, $author$project$Main$Dead)) ? $author$project$Main$Alive : state))));
 	});
 var $author$project$Main$step = function (model) {

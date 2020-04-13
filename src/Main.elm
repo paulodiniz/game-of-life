@@ -28,7 +28,11 @@ type alias Model =
 
 aliveCells : Random.Generator (List ( Int, Int ))
 aliveCells =
-    Random.list 10 (Random.pair (Random.int 0 numRows) (Random.int 0 numCols))
+    let
+        numberOfAlive =
+            (numRows * numCols) * 10 // 100
+    in
+    Random.list numberOfAlive (Random.pair (Random.int 0 numRows) (Random.int 0 numCols))
 
 
 init : () -> ( Model, Cmd Msg )
@@ -68,31 +72,35 @@ step model =
         transformRow rowIndex column =
             List.indexedMap (\columnIndex value -> updateCell model rowIndex columnIndex value) column
 
-        transformedCells = List.indexedMap transformRow model.cells
-
-
+        transformedCells =
+            List.indexedMap transformRow model.cells
     in
     transformedCells
+
 
 updateCell : Model -> Int -> Int -> CellState -> CellState
 updateCell model x y state =
     let
-        an = aliveNeighbours model (x, y) |> List.length
-        _ =
-            Debug.log "alive neighbours" an
+        an =
+            aliveNeighbours model ( x, y ) |> List.length
     in
-        if an < 2 && state == Alive then
-            Dead
-        else if an == 2 && state == Alive then
-            Alive
-        else if an == 3 && state == Alive then
-            Alive
-        else if an > 3 && state == Alive then
-            Dead
-        else if an == 3 && state == Dead then
-            Alive
-        else
-            state
+    if an < 2 && state == Alive then
+        Dead
+
+    else if an == 2 && state == Alive then
+        Alive
+
+    else if an == 3 && state == Alive then
+        Alive
+
+    else if an > 3 && state == Alive then
+        Dead
+
+    else if an == 3 && state == Dead then
+        Alive
+
+    else
+        state
 
 
 getNeighbours : ( Int, Int ) -> List ( Int, Int )
@@ -182,15 +190,15 @@ view model =
 
 
 width =
-    400
+    800
 
 
 height =
-    400
+    800
 
 
 squareSize =
-    50
+    10
 
 
 drawSquares : Model -> List Renderable
