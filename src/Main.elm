@@ -6,14 +6,16 @@ import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
 import Color exposing (Color)
-import Html exposing (Html)
+import Html exposing (Html, div)
 import Random
 import Time exposing (Posix)
+import CanvasEvents exposing (Point, onClick)
 
 
 type Msg
     = SeedLife (List ( Int, Int ))
     | Tick Time.Posix
+    | Wat Point
 
 
 type CellState
@@ -63,6 +65,13 @@ update msg model =
 
         Tick time ->
             ( { model | cells = step model }, Cmd.none )
+
+        Wat bla ->
+            let
+                _ =
+                    Debug.log "clicked" bla
+            in
+            ( model, Cmd.none )
 
 
 step : Model -> List (List CellState)
@@ -184,7 +193,7 @@ numCols =
 view : Model -> Html Msg
 view model =
     Canvas.toHtml ( width, height )
-        []
+        [onClick Wat]
         (drawSquares model)
 
 
@@ -197,7 +206,7 @@ height =
 
 
 squareSize =
-    10
+    50
 
 
 drawSquares : Model -> List Renderable
@@ -233,7 +242,7 @@ renderSquare line col color =
         posY =
             line * squareSize |> toFloat
     in
-     shapes [ fill color, stroke Color.black ] [ rect ( posX, posY ) squareSize squareSize ]
+    shapes [ fill color, stroke Color.black ] [ rect ( posX, posY ) squareSize squareSize ]
 
 
 main : Program () Model Msg

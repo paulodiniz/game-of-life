@@ -5316,7 +5316,7 @@ var $elm$random$Random$list = F2(
 			});
 	});
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$squareSize = 10;
+var $author$project$Main$squareSize = 50;
 var $author$project$Main$width = 800;
 var $author$project$Main$numCols = $elm$core$Basics$round($author$project$Main$width / $author$project$Main$squareSize);
 var $author$project$Main$height = 800;
@@ -5875,6 +5875,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Main$subscriptions = function (model) {
 	return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
 };
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$Alive = {$: 'Alive'};
@@ -6132,26 +6133,34 @@ var $author$project$Main$step = function (model) {
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'SeedLife') {
-			var indexes = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						cells: A2($author$project$Main$seedLife, model, indexes)
-					}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var time = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						cells: $author$project$Main$step(model)
-					}),
-				$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'SeedLife':
+				var indexes = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							cells: A2($author$project$Main$seedLife, model, indexes)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'Tick':
+				var time = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							cells: $author$project$Main$step(model)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var bla = msg.a;
+				var _v1 = A2($elm$core$Debug$log, 'clicked', bla);
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$Wat = function (a) {
+	return {$: 'Wat', a: a};
+};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -6163,6 +6172,11 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $avh4$elm_color$Color$RgbaSpace = F4(
+	function (a, b, c, d) {
+		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
+	});
+var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -6309,6 +6323,10 @@ var $joakin$elm_canvas$Canvas$shapes = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes(ss)
 				}));
 	});
+var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
+	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
+		$joakin$elm_canvas$Canvas$Internal$Canvas$Stroke(color));
+};
 var $author$project$Main$renderSquare = F3(
 	function (line, col, color) {
 		var posY = line * $author$project$Main$squareSize;
@@ -6317,7 +6335,8 @@ var $author$project$Main$renderSquare = F3(
 			$joakin$elm_canvas$Canvas$shapes,
 			_List_fromArray(
 				[
-					$joakin$elm_canvas$Canvas$Settings$fill(color)
+					$joakin$elm_canvas$Canvas$Settings$fill(color),
+					$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$black)
 				]),
 			_List_fromArray(
 				[
@@ -6327,10 +6346,6 @@ var $author$project$Main$renderSquare = F3(
 					$author$project$Main$squareSize,
 					$author$project$Main$squareSize)
 				]));
-	});
-var $avh4$elm_color$Color$RgbaSpace = F4(
-	function (a, b, c, d) {
-		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
 	});
 var $avh4$elm_color$Color$rgb = F3(
 	function (r, g, b) {
@@ -6363,6 +6378,104 @@ var $author$project$Main$drawSquares = function (_v0) {
 	var cells = _v0.cells;
 	return $elm$core$List$concat(
 		A2($elm$core$List$indexedMap, $author$project$Main$parseRow, cells));
+};
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$CanvasEvents$PositionData = F4(
+	function (client, offset, body, documentElement) {
+		return {body: body, client: client, documentElement: documentElement, offset: offset};
+	});
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$CanvasEvents$toTuple = F2(
+	function (x, y) {
+		return A3(
+			$elm$json$Json$Decode$map2,
+			$elm$core$Tuple$pair,
+			A2($elm$json$Json$Decode$at, x, $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$at, y, $elm$json$Json$Decode$float));
+	});
+var $author$project$CanvasEvents$positionDecoder = A5(
+	$elm$json$Json$Decode$map4,
+	$author$project$CanvasEvents$PositionData,
+	A2(
+		$author$project$CanvasEvents$toTuple,
+		_List_fromArray(
+			['clientX']),
+		_List_fromArray(
+			['clientY'])),
+	A2(
+		$author$project$CanvasEvents$toTuple,
+		_List_fromArray(
+			['target', 'offsetLeft']),
+		_List_fromArray(
+			['target', 'offsetTop'])),
+	A2(
+		$author$project$CanvasEvents$toTuple,
+		_List_fromArray(
+			['view', 'document', 'body', 'scrollLeft']),
+		_List_fromArray(
+			['view', 'document', 'body', 'scrollTop'])),
+	A2(
+		$author$project$CanvasEvents$toTuple,
+		_List_fromArray(
+			['view', 'document', 'documentElement', 'scrollLeft']),
+		_List_fromArray(
+			['view', 'document', 'documentElement', 'scrollTop'])));
+var $author$project$CanvasEvents$Point = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
+var $author$project$CanvasEvents$positionInCanvas = function (_v0) {
+	var client = _v0.client;
+	var offset = _v0.offset;
+	var body = _v0.body;
+	var documentElement = _v0.documentElement;
+	var _v1 = offset;
+	var ox = _v1.a;
+	var oy = _v1.b;
+	var _v2 = documentElement;
+	var dx = _v2.a;
+	var dy = _v2.b;
+	var _v3 = client;
+	var cx = _v3.a;
+	var cy = _v3.b;
+	var _v4 = body;
+	var bx = _v4.a;
+	var by = _v4.b;
+	return A2($author$project$CanvasEvents$Point, ((cx + bx) + dx) - ox, ((cy + by) + dy) - oy);
+};
+var $author$project$CanvasEvents$onClick = function (message) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		A2(
+			$elm$json$Json$Decode$map,
+			A2($elm$core$Basics$composeR, $author$project$CanvasEvents$positionInCanvas, message),
+			$author$project$CanvasEvents$positionDecoder));
 };
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
 var $joakin$elm_canvas$Canvas$cnvs = A2($elm$html$Html$canvas, _List_Nil, _List_Nil);
@@ -6680,7 +6793,6 @@ var $joakin$elm_canvas$Canvas$renderShape = F2(
 							cmds)));
 		}
 	});
-var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$NonZero = {$: 'NonZero'};
 var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$fillRuleToString = function (fillRule) {
 	if (fillRule.$ === 'NonZero') {
@@ -7003,18 +7115,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $elm$json$Json$Decode$value = _Json_decodeValue;
 var $joakin$elm_canvas$Canvas$decodeTextureImageInfo = A2(
 	$elm$json$Json$Decode$andThen,
@@ -7038,17 +7139,6 @@ var $joakin$elm_canvas$Canvas$decodeTextureImageInfo = A2(
 	},
 	A2($elm$json$Json$Decode$field, 'target', $elm$json$Json$Decode$value));
 var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -7135,7 +7225,10 @@ var $author$project$Main$view = function (model) {
 	return A3(
 		$joakin$elm_canvas$Canvas$toHtml,
 		_Utils_Tuple2($author$project$Main$width, $author$project$Main$height),
-		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$CanvasEvents$onClick($author$project$Main$Wat)
+			]),
 		$author$project$Main$drawSquares(model));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
