@@ -6105,13 +6105,29 @@ var $author$project$Main$aliveNeighbours = F2(
 			neighbours);
 	});
 var $elm$core$Debug$log = _Debug_log;
+var $author$project$Main$updateCell = F4(
+	function (model, x, y, state) {
+		var an = $elm$core$List$length(
+			A2(
+				$author$project$Main$aliveNeighbours,
+				model,
+				_Utils_Tuple2(x, y)));
+		var _v0 = A2($elm$core$Debug$log, 'alive neighbours', an);
+		return ((an < 2) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Dead : (((an === 2) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Alive : (((an === 3) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Alive : (((an > 3) && _Utils_eq(state, $author$project$Main$Alive)) ? $author$project$Main$Dead : (((an === 3) && _Utils_eq(state, $author$project$Main$Dead)) ? $author$project$Main$Alive : state))));
+	});
 var $author$project$Main$step = function (model) {
-	var wat = A2(
-		$author$project$Main$aliveNeighbours,
-		model,
-		_Utils_Tuple2(0, 1));
-	var _v0 = A2($elm$core$Debug$log, 'alive neighbours of (0, 1) is ', wat);
-	return model.cells;
+	var transformRow = F2(
+		function (rowIndex, column) {
+			return A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (columnIndex, value) {
+						return A4($author$project$Main$updateCell, model, rowIndex, columnIndex, value);
+					}),
+				column);
+		});
+	var transformedCells = A2($elm$core$List$indexedMap, transformRow, model.cells);
+	return transformedCells;
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {

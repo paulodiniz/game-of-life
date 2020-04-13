@@ -65,12 +65,34 @@ update msg model =
 step : Model -> List (List CellState)
 step model =
     let
-        wat = aliveNeighbours model ( 0, 1 )
+        transformRow rowIndex column =
+            List.indexedMap (\columnIndex value -> updateCell model rowIndex columnIndex value) column
 
-        _ =
-            Debug.log "alive neighbours of (0, 1) is " wat
+        transformedCells = List.indexedMap transformRow model.cells
+
+
     in
-    model.cells
+    transformedCells
+
+updateCell : Model -> Int -> Int -> CellState -> CellState
+updateCell model x y state =
+    let
+        an = aliveNeighbours model (x, y) |> List.length
+        _ =
+            Debug.log "alive neighbours" an
+    in
+        if an < 2 && state == Alive then
+            Dead
+        else if an == 2 && state == Alive then
+            Alive
+        else if an == 3 && state == Alive then
+            Alive
+        else if an > 3 && state == Alive then
+            Dead
+        else if an == 3 && state == Dead then
+            Alive
+        else
+            state
 
 
 getNeighbours : ( Int, Int ) -> List ( Int, Int )
