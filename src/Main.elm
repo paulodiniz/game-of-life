@@ -2,12 +2,11 @@ module Main exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Browser.Events exposing (onAnimationFrame, onAnimationFrameDelta)
 import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
 import Color exposing (Color)
-import Html exposing (Html, div)
+import Html exposing (Html)
 import Random
 import Time exposing (Posix)
 
