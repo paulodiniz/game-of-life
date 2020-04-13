@@ -5,17 +5,20 @@ import Browser
 import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
+import CanvasEvents exposing (Point, onClick)
 import Color exposing (Color)
-import Html exposing (Html, div)
+import Html exposing (Html, button, div, text)
+import Html.Events exposing (onClick)
 import Random
 import Time exposing (Posix)
-import CanvasEvents exposing (Point, onClick)
 
 
 type Msg
     = SeedLife (List ( Int, Int ))
     | Tick Time.Posix
-    | Wat Point
+    | ClickCanvas Point
+    | PauseGame
+    | ResumeGame
 
 
 type CellState
@@ -23,8 +26,13 @@ type CellState
     | Alive
 
 
+type GameState
+    = Paused
+    | Running
+
+
 type alias Model =
-    { rows : Int, cols : Int, cells : List (List CellState) }
+    { rows : Int, cols : Int, cells : List (List CellState), state : GameState }
 
 
 aliveCells : Random.Generator (List ( Int, Int ))
@@ -38,7 +46,7 @@ aliveCells =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { rows = numRows, cols = numCols, cells = initialCells }, Random.generate SeedLife aliveCells )
+    ( { rows = numRows, cols = numCols, cells = initialCells, state = Running }, Random.generate SeedLife aliveCells )
 
 
 initialCells =
@@ -66,12 +74,18 @@ update msg model =
         Tick time ->
             ( { model | cells = step model }, Cmd.none )
 
-        Wat bla ->
+        ClickCanvas point ->
             let
                 _ =
-                    Debug.log "clicked" bla
+                    Debug.log "clicked" point
             in
             ( model, Cmd.none )
+
+        PauseGame ->
+            ( { model | state = Paused }, Cmd.none )
+
+        ResumeGame ->
+            ( { model | state = Running }, Cmd.none )
 
 
 step : Model -> List (List CellState)
@@ -83,7 +97,12 @@ step model =
         transformedCells =
             List.indexedMap transformRow model.cells
     in
-    transformedCells
+    case model.state of
+        Paused ->
+            model.cells
+
+        Running ->
+            transformedCells
 
 
 updateCell : Model -> Int -> Int -> CellState -> CellState
@@ -192,8 +211,17 @@ numCols =
 
 view : Model -> Html Msg
 view model =
+    div []
+        [ canvas model
+        , button [ Html.Events.onClick PauseGame ] [ Html.text "Pause" ]
+        , button [ Html.Events.onClick ResumeGame ] [ Html.text "Resume" ]
+        ]
+
+
+canvas : Model -> Html Msg
+canvas model =
     Canvas.toHtml ( width, height )
-        [onClick Wat]
+        [ CanvasEvents.onClick ClickCanvas ]
         (drawSquares model)
 
 

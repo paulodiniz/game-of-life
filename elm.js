@@ -5227,6 +5227,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Running = {$: 'Running'};
 var $author$project$Main$SeedLife = function (a) {
 	return {$: 'SeedLife', a: a};
 };
@@ -5467,7 +5468,7 @@ var $author$project$Main$initialCells = function () {
 }();
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{cells: $author$project$Main$initialCells, cols: $author$project$Main$numCols, rows: $author$project$Main$numRows},
+		{cells: $author$project$Main$initialCells, cols: $author$project$Main$numCols, rows: $author$project$Main$numRows, state: $author$project$Main$Running},
 		A2($elm$random$Random$generate, $author$project$Main$SeedLife, $author$project$Main$aliveCells));
 };
 var $author$project$Main$Tick = function (a) {
@@ -5875,6 +5876,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Main$subscriptions = function (model) {
 	return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
 };
+var $author$project$Main$Paused = {$: 'Paused'};
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6129,7 +6131,12 @@ var $author$project$Main$step = function (model) {
 				column);
 		});
 	var transformedCells = A2($elm$core$List$indexedMap, transformRow, model.cells);
-	return transformedCells;
+	var _v0 = model.state;
+	if (_v0.$ === 'Paused') {
+		return model.cells;
+	} else {
+		return transformedCells;
+	}
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6152,14 +6159,29 @@ var $author$project$Main$update = F2(
 							cells: $author$project$Main$step(model)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
-				var bla = msg.a;
-				var _v1 = A2($elm$core$Debug$log, 'clicked', bla);
+			case 'ClickCanvas':
+				var point = msg.a;
+				var _v1 = A2($elm$core$Debug$log, 'clicked', point);
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'PauseGame':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{state: $author$project$Main$Paused}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{state: $author$project$Main$Running}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$Wat = function (a) {
-	return {$: 'Wat', a: a};
+var $author$project$Main$PauseGame = {$: 'PauseGame'};
+var $author$project$Main$ResumeGame = {$: 'ResumeGame'};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$ClickCanvas = function (a) {
+	return {$: 'ClickCanvas', a: a};
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -7221,15 +7243,53 @@ var $joakin$elm_canvas$Canvas$toHtml = F3(
 			attrs,
 			entities);
 	});
-var $author$project$Main$view = function (model) {
+var $author$project$Main$canvas = function (model) {
 	return A3(
 		$joakin$elm_canvas$Canvas$toHtml,
 		_Utils_Tuple2($author$project$Main$width, $author$project$Main$height),
 		_List_fromArray(
 			[
-				$author$project$CanvasEvents$onClick($author$project$Main$Wat)
+				$author$project$CanvasEvents$onClick($author$project$Main$ClickCanvas)
 			]),
 		$author$project$Main$drawSquares(model));
+};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$Main$canvas(model),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$PauseGame)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Pause')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$ResumeGame)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Resume')
+					]))
+			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
