@@ -5316,7 +5316,7 @@ var $elm$random$Random$list = F2(
 			});
 	});
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$squareSize = 50;
+var $author$project$Main$squareSize = 10;
 var $author$project$Main$width = 800;
 var $author$project$Main$numCols = $elm$core$Basics$round($author$project$Main$width / $author$project$Main$squareSize);
 var $author$project$Main$height = 800;

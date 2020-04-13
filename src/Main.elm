@@ -206,7 +206,7 @@ height =
 
 
 squareSize =
-    50
+    10
 
 
 drawSquares : Model -> List Renderable
