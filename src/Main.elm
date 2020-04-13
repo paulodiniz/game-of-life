@@ -233,7 +233,7 @@ renderSquare line col color =
         posY =
             line * squareSize |> toFloat
     in
-    shapes [ fill color ] [ rect ( posX, posY ) squareSize squareSize ]
+     shapes [ fill color, stroke Color.black ] [ rect ( posX, posY ) squareSize squareSize ]
 
 
 main : Program () Model Msg
