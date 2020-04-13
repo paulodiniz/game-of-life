@@ -14,7 +14,7 @@ import Time exposing (Posix)
 
 type Msg
     = SeedLife (List ( Int, Int ))
-    | Frame Float
+    | Tick Time.Posix
 
 
 type CellState
@@ -49,21 +49,82 @@ initialCells =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    onAnimationFrameDelta Frame
+    Time.every 1000 Tick
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Frame _ ->
-            ( model, Cmd.none )
-
         SeedLife indexes ->
-            let
-                _ =
-                    Debug.log "Update sending" indexes
-            in
             ( { model | cells = seedLife model indexes }, Cmd.none )
+
+        Tick time ->
+            ( { model | cells = step model }, Cmd.none )
+
+
+step : Model -> List (List CellState)
+step model =
+    let
+        wat = aliveNeighbours model ( 0, 1 )
+
+        _ =
+            Debug.log "alive neighbours of (0, 1) is " wat
+    in
+    model.cells
+
+
+getNeighbours : ( Int, Int ) -> List ( Int, Int )
+getNeighbours ( x, y ) =
+    let
+        possible =
+            [ ( x - 1, y - 1 )
+            , ( x - 1, y )
+            , ( x - 1, y + 1 )
+            , ( x, y - 1 )
+            , ( x, y + 1 )
+            , ( x + 1, y - 1 )
+            , ( x + 1, y )
+            , ( x + 1, y + 1 )
+            ]
+    in
+    possible
+        |> List.filter (\point -> Tuple.first point >= 0 && Tuple.first point < numRows)
+        |> List.filter (\point -> Tuple.second point >= 0 && Tuple.second point < numCols)
+
+
+aliveNeighbours : Model -> ( Int, Int ) -> List ( Int, Int )
+aliveNeighbours model point =
+    let
+        neighbours =
+            getNeighbours point
+    in
+    List.filter (\neighbour -> isCellAlive model neighbour) neighbours
+
+
+isCellAlive : Model -> ( Int, Int ) -> Bool
+isCellAlive model point =
+    let
+        cells =
+            model.cells
+
+        x =
+            Tuple.first point
+
+        y =
+            Tuple.second point
+
+        column =
+            cells |> Array.fromList |> Array.get x |> Maybe.withDefault []
+
+        value =
+            column |> Array.fromList |> Array.get y |> Maybe.withDefault Dead
+    in
+    case value of
+        Dead ->
+            False
+
+        Alive ->
+            True
 
 
 seedLife : Model -> List ( Int, Int ) -> List (List CellState)
@@ -75,10 +136,10 @@ seedLifeInCell : ( Int, Int ) -> List (List CellState) -> List (List CellState)
 seedLifeInCell ( rowIndex, colIndex ) cells =
     let
         column =
-            cells |> Array.fromList |> Array.get rowIndex |> Maybe.withDefault([]) |> Array.fromList
+            cells |> Array.fromList |> Array.get rowIndex |> Maybe.withDefault [] |> Array.fromList
 
-        newColumn
-            = Array.set colIndex Alive column |> Array.toList
+        newColumn =
+            Array.set colIndex Alive column |> Array.toList
     in
     Array.set rowIndex newColumn (cells |> Array.fromList) |> Array.toList
 
